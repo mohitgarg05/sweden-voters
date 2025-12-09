@@ -41,5 +41,6 @@ export const API_ENDPOINTS = {
   BARS: '/bars',
   DONATIONS: '/donations',
   CONFIG: '/config',
+  AUTH: '/auth',
 };
 

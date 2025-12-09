@@ -1,0 +1,49 @@
+.bar-management__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.bar-management__header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #0b2545;
+}
+
+.bar-management__add-btn {
+  padding: 10px 20px;
+  background: #2b7a78;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.bar-management__add-btn:hover {
+  background: #236967;
+}
+
+.bar-management__form-wrapper {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f7f9fb;
+  border-radius: 12px;
+  border: 1px solid #eef3f6;
+}
+
+@media (max-width: 600px) {
+  .bar-management__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .bar-management__add-btn {
+    width: 100%;
+  }
+}
+

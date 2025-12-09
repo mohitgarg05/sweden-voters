@@ -53,7 +53,7 @@ export default function DonationBars() {
           <div className="donation-bars-page__controls">
             {bars.map((bar, index) => (
               <DonationBarCard
-                key={bar.id || index}
+                key={bar._id || bar.id || index}
                 bar={bar}
                 onDonate={(amount) => handleDonate(index, amount)}
               />

@@ -1,0 +1,115 @@
+.bar-list__empty {
+  text-align: center;
+  padding: 40px;
+  color: #4b5563;
+}
+
+.bar-list {
+  overflow-x: auto;
+}
+
+.bar-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.bar-list__table th {
+  text-align: left;
+  padding: 12px;
+  background: #f7f9fb;
+  border-bottom: 2px solid #eef3f6;
+  font-weight: 600;
+  color: #0b2545;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.bar-list__table th:first-child {
+  padding-left: 12px;
+}
+
+.bar-list__table td {
+  padding: 12px;
+  border-bottom: 1px solid #eef3f6;
+  font-size: 14px;
+  color: #4b5563;
+  text-align: left;
+}
+
+.bar-list__table tr:hover {
+  background: #f7f9fb;
+}
+
+.bar-list__status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bar-list__status.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.bar-list__status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.bar-list__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bar-list__edit-btn,
+.bar-list__delete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.bar-list__edit-btn {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.bar-list__edit-btn:hover {
+  background: #bfdbfe;
+}
+
+.bar-list__delete-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.bar-list__delete-btn:hover {
+  background: #fecaca;
+}
+
+@media (max-width: 900px) {
+  .bar-list__table {
+    font-size: 12px;
+  }
+
+  .bar-list__table th,
+  .bar-list__table td {
+    padding: 8px;
+  }
+
+  .bar-list__edit-btn,
+  .bar-list__delete-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-right: 4px;
+  }
+}
+

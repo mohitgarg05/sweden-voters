@@ -21,9 +21,12 @@ export const createDonation = async (req, res) => {
     const savedDonation = await donation.save();
 
     bar.currentValue += amount;
-    await bar.save();
+    const updatedBar = await bar.save();
 
-    res.status(201).json(savedDonation);
+    res.status(201).json({
+      ...savedDonation.toObject(),
+      bar: updatedBar,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

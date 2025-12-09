@@ -1,0 +1,151 @@
+.donations-view__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.donations-view__header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #0b2545;
+}
+
+.donations-view__refresh-btn {
+  padding: 8px 16px;
+  background: #2b7a78;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.donations-view__refresh-btn:hover {
+  background: #236967;
+}
+
+.donations-view__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f7f9fb;
+  border-radius: 12px;
+}
+
+.donations-view__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.donations-view__stat-label {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.donations-view__stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #0b2545;
+}
+
+.donations-view__filter {
+  margin-bottom: 16px;
+}
+
+.donations-view__filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d6e0e8;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.donations-view__table-wrapper {
+  overflow-x: auto;
+}
+
+.donations-view__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.donations-view__table th {
+  text-align: left;
+  padding: 12px;
+  background: #f7f9fb;
+  border-bottom: 2px solid #eef3f6;
+  font-weight: 600;
+  color: #0b2545;
+  font-size: 14px;
+}
+
+.donations-view__table td {
+  padding: 12px;
+  border-bottom: 1px solid #eef3f6;
+  font-size: 14px;
+  color: #4b5563;
+  text-align: left;
+}
+
+.donations-view__table tr:hover {
+  background: #f7f9fb;
+}
+
+.donations-view__amount {
+  font-weight: 600;
+  color: #065f46;
+}
+
+.donations-view__method {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.donations-view__method.swish {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.donations-view__method.paypal {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.donations-view__method.manual {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.donations-view__email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.donations-view__empty {
+  text-align: center;
+  padding: 40px;
+  color: #4b5563;
+}
+
+@media (max-width: 900px) {
+  .donations-view__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .donations-view__table {
+    font-size: 12px;
+  }
+
+  .donations-view__table th,
+  .donations-view__table td {
+    padding: 8px;
+  }
+}
+

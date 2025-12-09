@@ -8,11 +8,7 @@ export function useDonationBars() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadBars();
-  }, []);
-
-  const loadBars = async () => {
+  const loadBars = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -24,7 +20,11 @@ export function useDonationBars() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadBars();
+  }, [loadBars]);
 
   const addDonationToBar = useCallback(async (barIndex, amount) => {
     if (amount <= 0) {
@@ -37,6 +37,7 @@ export function useDonationBars() {
     }
 
     const startValue = bar.currentValue;
+    const barId = bar._id || bar.id;
 
     await randomDelay(ANIMATION_DELAY_MAX);
 
@@ -53,11 +54,18 @@ export function useDonationBars() {
     );
 
     try {
-      await addDonation(bar.id || barIndex, amount);
+      await addDonation(barId, amount);
+      await loadBars();
     } catch (err) {
       console.error('Failed to save donation to backend:', err);
+      setBars((prevBars) => {
+        const updated = [...prevBars];
+        updated[barIndex] = { ...updated[barIndex], currentValue: startValue };
+        return updated;
+      });
+      throw err;
     }
-  }, [bars]);
+  }, [bars, loadBars]);
 
   return {
     bars,

@@ -7,15 +7,16 @@ import {
   deleteBar,
   getAllBarsAdmin,
 } from '../controllers/barController.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
 router.get('/', getAllBars);
-router.get('/admin', getAllBarsAdmin);
+router.get('/admin', authenticate, getAllBarsAdmin);
 router.get('/:id', getBarById);
-router.post('/', createBar);
-router.put('/:id', updateBar);
-router.delete('/:id', deleteBar);
+router.post('/', authenticate, createBar);
+router.put('/:id', authenticate, updateBar);
+router.delete('/:id', authenticate, deleteBar);
 
 export default router;
 
