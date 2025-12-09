@@ -1,0 +1,26 @@
+.donation-chart {
+  height: 300px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.donation-chart canvas {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .donation-chart {
+    height: 250px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 400px) {
+  .donation-chart {
+    height: 220px;
+  }
+}
+

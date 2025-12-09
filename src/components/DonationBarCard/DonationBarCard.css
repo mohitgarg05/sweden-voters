@@ -1,0 +1,146 @@
+.donation-bar-card {
+  background: #fcfeff;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #eef3f6;
+  touch-action: manipulation;
+}
+
+.donation-bar-card__title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #0b2545;
+  font-size: 15px;
+}
+
+.donation-bar-card__value {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.donation-bar-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.donation-bar-card__input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d6e0e8;
+  font-size: 16px;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+}
+
+.donation-bar-card__input:focus {
+  outline: none;
+  border-color: var(--accent, #2b7a78);
+  box-shadow: 0 0 0 3px rgba(43, 122, 120, 0.1);
+}
+
+.donation-bar-card__input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.donation-bar-card__input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.donation-bar-card__input[type="number"]::-webkit-inner-spin-button,
+.donation-bar-card__input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.donation-bar-card__button {
+  display: inline-block;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent, #2b7a78);
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+  min-height: 44px;
+  width: 100%;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(43, 122, 120, 0.2);
+}
+
+.donation-bar-card__button:hover:not(:disabled) {
+  background: #236967;
+  transform: translateY(-1px);
+}
+
+.donation-bar-card__button:active:not(:disabled) {
+  background: #1d5654;
+  transform: translateY(0);
+}
+
+.donation-bar-card__button:disabled {
+  background: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.donation-bar-card__qr {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .donation-bar-card {
+    padding: 14px;
+  }
+
+  .donation-bar-card__title {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .donation-bar-card__value {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .donation-bar-card__input {
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .donation-bar-card__button {
+    padding: 10px 14px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .donation-bar-card__qr {
+    gap: 10px;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .donation-bar-card {
+    padding: 12px;
+  }
+
+  .donation-bar-card__qr {
+    gap: 8px;
+  }
+}
+

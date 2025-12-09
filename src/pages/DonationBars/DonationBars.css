@@ -1,0 +1,148 @@
+:root {
+  --accent: #2b7a78;
+  --muted: #666;
+}
+
+.donation-bars-page {
+  padding: 24px;
+  background: #f7f9fb;
+  color: #0b2545;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.donation-bars-page__container {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.donation-bars-page__header {
+  margin-bottom: 24px;
+}
+
+.donation-bars-page__header h1 {
+  font-size: 20px;
+  margin: 0 0 8px;
+  color: #0b2545;
+  font-weight: 600;
+}
+
+.donation-bars-page__description {
+  font-size: 12px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.donation-bars-page__chart-wrap {
+  background: #fff;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.donation-bars-page__controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.donation-bars-page__loading,
+.donation-bars-page__error {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+}
+
+.donation-bars-page__error {
+  color: #dc2626;
+}
+
+.donation-bars-page__footer {
+  margin-top: 12px;
+}
+
+.donation-bars-page__notes {
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.donation-bars-page__notes strong {
+  color: #0b2545;
+}
+
+@media (max-width: 900px) {
+  .donation-bars-page__controls {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 16px;
+  }
+
+  .donation-bars-page__chart-wrap {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .donation-bars-page {
+    padding: 12px;
+  }
+
+  .donation-bars-page__header {
+    margin-bottom: 20px;
+  }
+
+  .donation-bars-page__header h1 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .donation-bars-page__description {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .donation-bars-page__chart-wrap {
+    padding: 12px 8px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+
+  .donation-bars-page__controls {
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .donation-bars-page__footer {
+    margin-top: 8px;
+  }
+
+  .donation-bars-page__notes {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .donation-bars-page {
+    padding: 8px;
+  }
+
+  .donation-bars-page__header h1 {
+    font-size: 16px;
+  }
+
+  .donation-bars-page__description {
+    font-size: 10px;
+  }
+}
+
