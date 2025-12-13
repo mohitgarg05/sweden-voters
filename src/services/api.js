@@ -32,6 +32,8 @@ const transformBar = (bar) => ({
   paypalUser: bar.paypalUser,
   isActive: bar.isActive,
   order: bar.order,
+  color: bar.color,
+  about: bar.about,
 });
 
 export async function fetchBars() {

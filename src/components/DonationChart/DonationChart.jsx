@@ -32,8 +32,65 @@ export default function DonationChart({ bars }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const labels = bars.map((bar) => bar.label);
+  // Helper function to generate short name from full name
+  // "Mohit Garg" -> "MG", "Mohit" -> "M"
+  const generateShortName = (fullName) => {
+    if (!fullName) return '';
+    const words = fullName.trim().split(/\s+/);
+    if (words.length === 1) {
+      // Single word: return first letter
+      return words[0].charAt(0).toUpperCase();
+    } else {
+      // Multiple words: return first letter of each word
+      return words.map(word => word.charAt(0).toUpperCase()).join('');
+    }
+  };
+
+  const labels = bars.map((bar) => generateShortName(bar.label));
   const data = bars.map((bar) => bar.currentValue);
+
+  // Helper function to convert color (hex or rgb) to rgba
+  const colorToRgba = (color, alpha = 0.85) => {
+    if (!color) return `rgba(43, 122, 120, ${alpha})`; // Default color
+    
+    // Handle RGB format: rgb(255, 0, 0) or rgba(255, 0, 0, 0.5)
+    const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
+    if (rgbMatch) {
+      const r = parseInt(rgbMatch[1], 10);
+      const g = parseInt(rgbMatch[2], 10);
+      const b = parseInt(rgbMatch[3], 10);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    
+    // Handle hex format: #2b7a78 or #2b7a78ff
+    if (color.startsWith('#')) {
+      let hex = color.slice(1);
+      // Handle 3-digit hex
+      if (hex.length === 3) {
+        hex = hex.split('').map(char => char + char).join('');
+      }
+      if (hex.length === 6) {
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+    }
+    
+    // Fallback to default color
+    return `rgba(43, 122, 120, ${alpha})`;
+  };
+
+  // Get colors for each bar, with fallback to default color
+  const backgroundColors = bars.map((bar) => {
+    const color = bar.color || '#2b7a78';
+    return colorToRgba(color, 0.85);
+  });
+
+  const borderColors = bars.map((bar) => {
+    const color = bar.color || '#2b7a78';
+    return colorToRgba(color, 1);
+  });
 
   const chartData = {
     labels,
@@ -41,8 +98,8 @@ export default function DonationChart({ bars }) {
       {
         label: 'Donations',
         data,
-        backgroundColor: 'rgba(43, 122, 120, 0.85)',
-        borderColor: 'rgba(43, 122, 120, 1)',
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
         borderWidth: 1,
       },
     ],

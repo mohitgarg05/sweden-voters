@@ -23,6 +23,10 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    document.title = 'Intelligence meter website';
+  }, []);
+
+  useEffect(() => {
     loadData();
   }, []);
 

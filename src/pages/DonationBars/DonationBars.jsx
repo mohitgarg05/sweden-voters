@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDonationBars } from '../../hooks/useDonationBars';
 import DonationChart from '../../components/DonationChart/DonationChart';
 import DonationBarCard from '../../components/DonationBarCard/DonationBarCard';
@@ -6,6 +6,10 @@ import './DonationBars.css';
 
 export default function DonationBars() {
   const { bars, loading, error, addDonationToBar } = useDonationBars();
+
+  useEffect(() => {
+    document.title = 'Intelligence meter website';
+  }, []);
 
   const handleDonate = useCallback(
     async (barIndex, amount) => {
@@ -38,12 +42,13 @@ export default function DonationBars() {
     <div className="donation-bars-page">
       <div className="donation-bars-page__container">
         <header className="donation-bars-page__header">
-          <h1>Interactive Donation Bars</h1>
+          <h1>Intelligence meter</h1>
           <p className="donation-bars-page__description">
-            Click a donate button (Swish or PayPal) or enter an amount and press
-            the green button to simulate a donation. The bar will increase in real
-            time (animated over ~1.5s). Replace the placeholder Swish numbers /
-            PayPal IDs below with your actual mobile/paypal links.
+          Support our website's work in investigating which parliamentary party
+          in Sweden you think former spy Thomas Nordholm should reveal
+          intelligence to in July 2026. Donate below. The party with the highest
+          bar in July 2026 is the one that the people consider most honest to turn
+          to.
           </p>
         </header>
 

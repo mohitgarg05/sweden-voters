@@ -11,8 +11,8 @@ export default function DonationBarCard({ bar, onDonate }) {
     e.preventDefault();
     const donationAmount = Number(amount);
 
-    if (donationAmount <= 0) {
-      alert('Please enter an amount greater than 0');
+    if (!donationAmount || donationAmount <= 0) {
+      alert('Please enter a donation amount');
       return;
     }
 
@@ -35,6 +35,12 @@ export default function DonationBarCard({ bar, onDonate }) {
     <div className="donation-bar-card">
       <div className="donation-bar-card__title">{bar.label}</div>
       
+      {bar.about && (
+        <div className="donation-bar-card__about">
+          {bar.about}
+        </div>
+      )}
+
       <div className="donation-bar-card__value">
         Current: {bar.currentValue}
       </div>
@@ -42,19 +48,20 @@ export default function DonationBarCard({ bar, onDonate }) {
       <form onSubmit={handleSubmit} className="donation-bar-card__form">
         <input
           type="number"
-          min="1"
-          step="1"
-          placeholder="Amount (e.g. 50)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="donation-bar-card__input"
+          placeholder="Enter donation amount (kr)"
           disabled={isSubmitting}
+          required
+          min="1"
+          step="1"
         />
 
         <button
           type="submit"
           className="donation-bar-card__button"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !amount}
         >
           {isSubmitting ? 'Processing...' : 'Add amount (simulate)'}
         </button>

@@ -24,11 +24,52 @@
 }
 
 .bar-form__field input[type="text"],
-.bar-form__field input[type="number"] {
+.bar-form__field input[type="number"],
+.bar-form__field textarea {
   padding: 10px;
   border: 1px solid #d6e0e8;
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
+}
+
+.bar-form__field textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.bar-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.bar-form__color-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.bar-form__color-input {
+  width: 60px;
+  height: 40px;
+  padding: 2px;
+  border: 1px solid #d6e0e8;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.bar-form__color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.bar-form__color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+
+.bar-form__color-text {
+  flex: 1;
 }
 
 .bar-form__field input:focus {

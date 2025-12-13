@@ -31,6 +31,16 @@ const barSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    about: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    color: {
+      type: String,
+      trim: true,
+      default: '#2b7a78',
+    }
   },
   {
     timestamps: true,

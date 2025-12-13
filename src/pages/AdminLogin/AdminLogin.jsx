@@ -12,6 +12,10 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = 'Intelligence meter website';
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/admin', { replace: true });
     }

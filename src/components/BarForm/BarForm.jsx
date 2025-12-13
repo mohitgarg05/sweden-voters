@@ -9,6 +9,8 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
     paypalUser: '',
     order: 0,
     isActive: true,
+    about: '',
+    color: '#2b7a78',
   });
 
   useEffect(() => {
@@ -20,6 +22,8 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
         paypalUser: bar.paypalUser || '',
         order: bar.order || 0,
         isActive: bar.isActive !== undefined ? bar.isActive : true,
+        about: bar.about || '',
+        color: bar.color || '#2b7a78',
       });
     }
   }, [bar]);
@@ -114,6 +118,42 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
             />
             Active
           </label>
+        </div>
+      </div>
+
+      <div className="bar-form__row">
+        <div className="bar-form__field bar-form__field--full">
+          <label>About</label>
+          <textarea
+            name="about"
+            value={formData.about}
+            onChange={handleChange}
+            placeholder="Enter information about this bar..."
+            rows="3"
+          />
+        </div>
+      </div>
+
+      <div className="bar-form__row">
+        <div className="bar-form__field">
+          <label>Color</label>
+          <div className="bar-form__color-wrapper">
+            <input
+              type="color"
+              name="color"
+              value={formData.color}
+              onChange={handleChange}
+              className="bar-form__color-input"
+            />
+            <input
+              type="text"
+              name="color"
+              value={formData.color}
+              onChange={handleChange}
+              placeholder="#2b7a78 or rgb(43, 122, 120)"
+              className="bar-form__color-text"
+            />
+          </div>
         </div>
       </div>
 
