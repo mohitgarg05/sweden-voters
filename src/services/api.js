@@ -179,6 +179,42 @@ export function getAuthToken() {
   return localStorage.getItem('adminToken');
 }
 
+export async function createSwishPaymentIntent(barId, amount) {
+  try {
+    const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-payment-intent`, {
+      barId,
+      amount,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating payment intent:', error);
+    throw error;
+  }
+}
+
+export async function createPayPalPaymentIntent(barId, amount) {
+  try {
+    const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-paypal-payment-intent`, {
+      barId,
+      amount,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating PayPal payment intent:', error);
+    throw error;
+  }
+}
+
+export async function verifyPaymentStatus(paymentIntentId) {
+  try {
+    const response = await apiClient.get(`${API_ENDPOINTS.STRIPE}/verify-payment/${paymentIntentId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying payment status:', error);
+    throw error;
+  }
+}
+
 function getDefaultBarsData() {
   return DEFAULT_BAR_LABELS.map((label, index) => ({
     id: index + 1,

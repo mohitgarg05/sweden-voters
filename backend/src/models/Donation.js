@@ -22,6 +22,15 @@ const donationSchema = new mongoose.Schema(
       email: String,
       message: String,
     },
+    stripePaymentIntentId: {
+      type: String,
+      default: null,
+    },
+    stripePaymentStatus: {
+      type: String,
+      enum: ['pending', 'succeeded', 'failed', 'canceled'],
+      default: null,
+    },
   },
   {
     timestamps: true,

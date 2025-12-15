@@ -78,6 +78,12 @@
   text-align: center;
 }
 
+.donation-bar-card__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .donation-bar-card__button {
   display: inline-block;
   padding: 12px 16px;
@@ -109,6 +115,26 @@
   background: #999;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.donation-bar-card__button--swish {
+  background: var(--accent, #2b7a78);
+}
+
+.donation-bar-card__button--swish:hover:not(:disabled) {
+  background: #236967;
+}
+
+.donation-bar-card__button--paypal {
+  background: #0070ba;
+}
+
+.donation-bar-card__button--paypal:hover:not(:disabled) {
+  background: #005ea6;
+}
+
+.donation-bar-card__button--paypal:active:not(:disabled) {
+  background: #004c85;
 }
 
 .donation-bar-card__qr {

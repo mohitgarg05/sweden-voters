@@ -1,13 +1,43 @@
-import { useState } from 'react';
-import QRCode from '../QRCode/QRCode';
-import { makeSwishLink, makePaypalLink } from '../../utils/payment';
+import { useState, useEffect } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { createSwishPaymentIntent, createPayPalPaymentIntent, verifyPaymentStatus } from '../../services/api';
 import './DonationBarCard.css';
 
-export default function DonationBarCard({ bar, onDonate }) {
-  const [amount, setAmount] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
-  const handleSubmit = async (e) => {
+export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
+  const [amount, setAmount] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(null);
+
+  // Check for payment intent in URL (return from redirect)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentIntentId = urlParams.get('payment_intent');
+    const barId = urlParams.get('bar_id');
+
+    if (paymentIntentId && barId && (bar._id === barId || bar.id === barId)) {
+      verifyPaymentStatus(paymentIntentId)
+        .then((status) => {
+          if (status.status === 'succeeded' && status.donationStatus === 'succeeded') {
+            // Payment was successful and donation was recorded by webhook
+            // Just reload bars to get updated values
+            if (onPaymentSuccess) {
+              onPaymentSuccess();
+            }
+            alert('Payment successful! Thank you for your donation.');
+            setAmount('');
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        })
+        .catch((error) => {
+          console.error('Error verifying payment:', error);
+        });
+    }
+  }, [bar._id, bar.id, onPaymentSuccess]);
+
+  const handleSwishPayment = async (e) => {
     e.preventDefault();
     const donationAmount = Number(amount);
 
@@ -16,20 +46,87 @@ export default function DonationBarCard({ bar, onDonate }) {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsProcessingPayment(true);
+    setPaymentMethod('swish');
     try {
-      await onDonate(donationAmount);
-      setAmount('');
+      // Create payment intent
+      const { clientSecret, paymentIntentId } = await createSwishPaymentIntent(
+        bar._id || bar.id,
+        donationAmount
+      );
+
+      // Initialize Stripe
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to initialize. Please check your Stripe publishable key.');
+      }
+
+      // Confirm payment with Swish (redirects to Swish app)
+      const { error } = await stripe.confirmSwishPayment(clientSecret, {
+        payment_method: {
+          type: 'swish',
+        },
+        return_url: `${window.location.origin}?payment_intent=${paymentIntentId}&bar_id=${bar._id || bar.id}`,
+      });
+
+      if (error) {
+        console.error('Payment error:', error);
+        alert(`Payment failed: ${error.message}`);
+        setIsProcessingPayment(false);
+        setPaymentMethod(null);
+      }
+      // If no error, user will be redirected to Swish app
     } catch (error) {
-      console.error('Donation failed:', error);
-      alert('Failed to process donation. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Payment failed:', error);
+      alert('Failed to process payment. Please try again.');
+      setIsProcessingPayment(false);
+      setPaymentMethod(null);
     }
   };
 
-  const swishLink = makeSwishLink(bar.swishNumber);
-  const paypalLink = makePaypalLink(bar.paypalUser);
+  const handlePayPalPayment = async (e) => {
+    e.preventDefault();
+    const donationAmount = Number(amount);
+
+    if (!donationAmount || donationAmount <= 0) {
+      alert('Please enter a donation amount');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setPaymentMethod('paypal');
+    try {
+      // Create payment intent
+      const { clientSecret, paymentIntentId } = await createPayPalPaymentIntent(
+        bar._id || bar.id,
+        donationAmount
+      );
+
+      // Initialize Stripe
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to initialize. Please check your Stripe publishable key.');
+      }
+
+      // Confirm payment with PayPal (redirects to PayPal)
+      const { error } = await stripe.confirmPayPalPayment(clientSecret, {
+        return_url: `${window.location.origin}?payment_intent=${paymentIntentId}&bar_id=${bar._id || bar.id}`,
+      });
+
+      if (error) {
+        console.error('Payment error:', error);
+        alert(`Payment failed: ${error.message}`);
+        setIsProcessingPayment(false);
+        setPaymentMethod(null);
+      }
+      // If no error, user will be redirected to PayPal
+    } catch (error) {
+      console.error('Payment failed:', error);
+      alert('Failed to process payment. Please try again.');
+      setIsProcessingPayment(false);
+      setPaymentMethod(null);
+    }
+  };
 
   return (
     <div className="donation-bar-card">
@@ -45,41 +142,39 @@ export default function DonationBarCard({ bar, onDonate }) {
         Current: {bar.currentValue}
       </div>
 
-      <form onSubmit={handleSubmit} className="donation-bar-card__form">
+      <div className="donation-bar-card__form">
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="donation-bar-card__input"
           placeholder="Enter donation amount (kr)"
-          disabled={isSubmitting}
+          disabled={isProcessingPayment}
           required
           min="1"
           step="1"
         />
 
-        <button
-          type="submit"
-          className="donation-bar-card__button"
-          disabled={isSubmitting || !amount}
-        >
-          {isSubmitting ? 'Processing...' : 'Add amount (simulate)'}
-        </button>
-      </form>
+        <div className="donation-bar-card__buttons">
+          <button
+            type="button"
+            onClick={handleSwishPayment}
+            className="donation-bar-card__button donation-bar-card__button--swish"
+            disabled={isProcessingPayment || !amount}
+          >
+            {isProcessingPayment && paymentMethod === 'swish' ? 'Processing...' : 'Add amount by Swish'}
+          </button>
 
-      <div className="donation-bar-card__qr">
-        <QRCode
-          value={swishLink}
-          title={`Swish: ${bar.swishNumber}`}
-          onClick={() => window.open(swishLink, '_blank')}
-        />
-        <QRCode
-          value={paypalLink}
-          title={`PayPal: ${bar.paypalUser}`}
-          onClick={() => window.open(paypalLink, '_blank')}
-        />
+          <button
+            type="button"
+            onClick={handlePayPalPayment}
+            className="donation-bar-card__button donation-bar-card__button--paypal"
+            disabled={isProcessingPayment || !amount}
+          >
+            {isProcessingPayment && paymentMethod === 'paypal' ? 'Processing...' : 'Add amount by PayPal'}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-

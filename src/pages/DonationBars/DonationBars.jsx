@@ -5,7 +5,7 @@ import DonationBarCard from '../../components/DonationBarCard/DonationBarCard';
 import './DonationBars.css';
 
 export default function DonationBars() {
-  const { bars, loading, error, addDonationToBar } = useDonationBars();
+  const { bars, loading, error, addDonationToBar, reloadBars } = useDonationBars();
 
   useEffect(() => {
     document.title = 'Intelligence meter website';
@@ -17,6 +17,12 @@ export default function DonationBars() {
     },
     [addDonationToBar]
   );
+
+  const handlePaymentSuccess = useCallback(() => {
+    // Reload bars to get updated values after successful Stripe payment
+    // (donation is already recorded by webhook)
+    reloadBars();
+  }, [reloadBars]);
 
   if (loading) {
     return (
@@ -61,6 +67,7 @@ export default function DonationBars() {
                 key={bar._id || bar.id || index}
                 bar={bar}
                 onDonate={(amount) => handleDonate(index, amount)}
+                onPaymentSuccess={handlePaymentSuccess}
               />
             ))}
           </div>
@@ -68,15 +75,11 @@ export default function DonationBars() {
 
         <footer className="donation-bars-page__footer">
           <p className="donation-bars-page__notes">
-            <strong>Notes:</strong> The page generates QR codes using a client-side
-            library (qrcode.react). For production you may prefer to generate QR codes
-            server-side or secure your payment links. Swish links and PayPal links
-            below are placeholders — replace them with your actual Swish mobile
-            numbers (format +467xxxxxxxx) or PayPal.me usernames.
+            <strong>Notes:</strong> Payments are processed securely through Stripe.
+            Swish payments are handled via the Stripe payment platform.
           </p>
         </footer>
       </div>
     </div>
   );
 }
-

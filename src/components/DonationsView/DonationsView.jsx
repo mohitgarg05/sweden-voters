@@ -63,7 +63,7 @@ export default function DonationsView({ donations, stats, onReload }) {
                 <th>Bar</th>
                 <th>Amount</th>
                 <th>Payment Method</th>
-                <th>Donor Info</th>
+                <th>Payment Status</th>
               </tr>
             </thead>
             <tbody>
@@ -78,12 +78,9 @@ export default function DonationsView({ donations, stats, onReload }) {
                     </span>
                   </td>
                   <td>
-                    {donation.donorInfo?.name && (
-                      <div>{donation.donorInfo.name}</div>
-                    )}
-                    {donation.donorInfo?.email && (
-                      <div className="donations-view__email">{donation.donorInfo.email}</div>
-                    )}
+                    <span className={`donations-view__status ${donation.stripePaymentStatus || 'pending'}`}>
+                      {donation.stripePaymentStatus || 'pending'}
+                    </span>
                   </td>
                 </tr>
               ))}
