@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import Footer from '../../components/Footer';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
@@ -72,16 +73,13 @@ export default function AdminLogin() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="admin-login__submit"
-              disabled={loading}
-            >
+            <button type="submit" className="admin-login__submit" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

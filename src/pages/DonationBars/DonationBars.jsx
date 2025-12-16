@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useDonationBars } from '../../hooks/useDonationBars';
 import DonationChart from '../../components/DonationChart/DonationChart';
 import DonationBarCard from '../../components/DonationBarCard/DonationBarCard';
+import Footer from '../../components/Footer';
 import './DonationBars.css';
 
 export default function DonationBars() {
@@ -51,10 +52,14 @@ export default function DonationBars() {
           <h1>Intelligence meter</h1>
           <p className="donation-bars-page__description">
           Support our website's work in investigating which parliamentary party
-          in Sweden you think former spy Thomas Nordholm should reveal
-          intelligence to in July 2026. Donate below. The party with the highest
-          bar in July 2026 is the one that the people consider most honest to turn
-          to.
+          in Sweden you think Thomas Nordholm with a background as a spy should
+          reveal
+          intelligence to by August 1 in 2026. Follow the donation instructions.
+
+          The party with the highest bar in August 1 in 2026 is the one that the
+          people consider most honest to turn
+          to. Nordholm has empirically decided two previous parliamentary
+          elections.
           </p>
         </header>
 
@@ -75,11 +80,12 @@ export default function DonationBars() {
 
         <footer className="donation-bars-page__footer">
           <p className="donation-bars-page__notes">
-            <strong>Notes:</strong> Payments are processed securely through Stripe.
-            Swish payments are handled via the Stripe payment platform.
+            <strong>Notes:</strong> Payments are processed securely through Stripe. Swish payments are
+            handled via the Stripe payment platform.
           </p>
         </footer>
       </div>
+      <Footer />
     </div>
   );
 }

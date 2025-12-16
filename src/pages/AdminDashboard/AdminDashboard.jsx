@@ -5,6 +5,7 @@ import { fetchBarsAdmin, createBar, updateBar, deleteBar } from '../../services/
 import { fetchDonations, fetchDonationStats } from '../../services/api';
 import BarManagement from '../../components/BarManagement/BarManagement';
 import DonationsView from '../../components/DonationsView/DonationsView';
+import Footer from '../../components/Footer';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
@@ -84,50 +85,51 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-dashboard">
-        <div className="admin-dashboard__container">
+      <div className="admin-dashboard__container">
         {loading && <div className="admin-dashboard__loading">Loading...</div>}
         {error && <div className="admin-dashboard__error">Error: {error}</div>}
         {!loading && !error && (
           <>
-        <div className="admin-dashboard__header">
-          <h1 className="admin-dashboard__title">Admin Dashboard</h1>
-          <button className="admin-dashboard__logout" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+            <div className="admin-dashboard__header">
+              <h1 className="admin-dashboard__title">Admin Dashboard</h1>
+              <button className="admin-dashboard__logout" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
 
-        <div className="admin-dashboard__tabs">
-          <button
-            className={`admin-dashboard__tab ${activeTab === 'bars' ? 'active' : ''}`}
-            onClick={() => setActiveTab('bars')}
-          >
-            Bars Management
-          </button>
-          <button
-            className={`admin-dashboard__tab ${activeTab === 'donations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('donations')}
-          >
-            Donations
-          </button>
-        </div>
+            <div className="admin-dashboard__tabs">
+              <button
+                className={`admin-dashboard__tab ${activeTab === 'bars' ? 'active' : ''}`}
+                onClick={() => setActiveTab('bars')}
+              >
+                Bars Management
+              </button>
+              <button
+                className={`admin-dashboard__tab ${activeTab === 'donations' ? 'active' : ''}`}
+                onClick={() => setActiveTab('donations')}
+              >
+                Donations
+              </button>
+            </div>
 
-        <div className="admin-dashboard__content">
-          {activeTab === 'bars' && (
-            <BarManagement
-              bars={bars}
-              onCreateBar={handleCreateBar}
-              onUpdateBar={handleUpdateBar}
-              onDeleteBar={handleDeleteBar}
-              onReload={loadData}
-            />
-          )}
-          {activeTab === 'donations' && (
-            <DonationsView donations={donations} stats={stats} onReload={loadData} />
-          )}
-        </div>
-        </>
+            <div className="admin-dashboard__content">
+              {activeTab === 'bars' && (
+                <BarManagement
+                  bars={bars}
+                  onCreateBar={handleCreateBar}
+                  onUpdateBar={handleUpdateBar}
+                  onDeleteBar={handleDeleteBar}
+                  onReload={loadData}
+                />
+              )}
+              {activeTab === 'donations' && (
+                <DonationsView donations={donations} stats={stats} onReload={loadData} />
+              )}
+            </div>
+          </>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
