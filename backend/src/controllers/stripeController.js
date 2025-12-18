@@ -16,58 +16,6 @@ function getStripe() {
   return stripeInstance;
 }
 
-// Create a payment intent for Swish
-export const createSwishPaymentIntent = async (req, res) => {
-  try {
-    const { barId, amount } = req.body;
-
-    if (!barId || !amount) {
-      return res.status(400).json({ error: 'barId and amount are required' });
-    }
-
-    if (amount <= 0) {
-      return res.status(400).json({ error: 'Amount must be greater than 0' });
-    }
-
-    const bar = await Bar.findById(barId);
-    if (!bar) {
-      return res.status(404).json({ error: 'Bar not found' });
-    }
-
-    // Create payment intent with Swish as payment method
-    const stripe = getStripe();
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to öre (Swedish cents)
-      currency: 'sek',
-      payment_method_types: ['swish'],
-      metadata: {
-        barId: barId.toString(),
-        barLabel: bar.label,
-      },
-    });
-
-    // Create a pending donation record
-    const donation = new Donation({
-      barId,
-      amount,
-      paymentMethod: 'swish',
-      stripePaymentIntentId: paymentIntent.id,
-      stripePaymentStatus: 'pending',
-    });
-
-    await donation.save();
-
-    res.status(200).json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-      donationId: donation._id,
-    });
-  } catch (error) {
-    console.error('Error creating Swish payment intent:', error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Create a payment intent for PayPal
 export const createPayPalPaymentIntent = async (req, res) => {
   try {

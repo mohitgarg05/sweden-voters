@@ -4,24 +4,36 @@ import Bar from '../models/Bar.js';
 
 export const createDonation = async (req, res) => {
   try {
-    const { barId, amount, paymentMethod, donorInfo } = req.body;
+    const { barId, amount, paymentMethod, donorInfo, swishOrderId, skipBarUpdate } = req.body;
 
     const bar = await Bar.findById(barId);
     if (!bar) {
       return res.status(404).json({ error: 'Bar not found' });
     }
 
-    const donation = new Donation({
+    const donationData = {
       barId,
       amount,
       paymentMethod: paymentMethod || 'manual',
       donorInfo: donorInfo || {},
-    });
+    };
 
+    if (paymentMethod === 'swish') {
+      donationData.swishOrderId = swishOrderId || undefined;
+      donationData.swishStatus = 'pending';
+    }
+
+    const donation = new Donation(donationData);
     const savedDonation = await donation.save();
 
-    bar.currentValue += amount;
-    const updatedBar = await bar.save();
+    let updatedBar = bar;
+    // IMPORTANT:
+    // - Swish donations should NOT update the bar total while pending.
+    // - Only non-Swish donations (manual / PayPal, etc.) update immediately.
+    if (!skipBarUpdate && donation.paymentMethod !== 'swish') {
+      bar.currentValue += amount;
+      updatedBar = await bar.save();
+    }
 
     res.status(201).json({
       ...savedDonation.toObject(),
@@ -34,8 +46,18 @@ export const createDonation = async (req, res) => {
 
 export const getDonations = async (req, res) => {
   try {
-    const { barId, limit = 50, skip = 0 } = req.query;
-    const query = barId ? { barId } : {};
+    const { barId, limit = 50, skip = 0, paymentMethod, swishStatus } = req.query;
+    const query = {};
+
+    if (barId) {
+      query.barId = barId;
+    }
+    if (paymentMethod) {
+      query.paymentMethod = paymentMethod;
+    }
+    if (swishStatus) {
+      query.swishStatus = swishStatus;
+    }
 
     const donations = await Donation.find(query)
       .populate('barId', 'label')

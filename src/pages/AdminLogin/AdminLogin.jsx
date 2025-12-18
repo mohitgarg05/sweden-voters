@@ -79,7 +79,6 @@ export default function AdminLogin() {
           </form>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

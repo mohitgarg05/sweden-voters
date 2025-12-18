@@ -31,6 +31,17 @@ const donationSchema = new mongoose.Schema(
       enum: ['pending', 'succeeded', 'failed', 'canceled'],
       default: null,
     },
+    swishOrderId: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    swishStatus: {
+      type: String,
+      enum: ['pending', 'completed'],
+      default: null,
+      index: true,
+    },
   },
   {
     timestamps: true,

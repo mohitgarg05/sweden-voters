@@ -80,8 +80,8 @@ export default function DonationBars() {
 
         <footer className="donation-bars-page__footer">
           <p className="donation-bars-page__notes">
-            <strong>Notes:</strong> Payments are processed securely through Stripe. Swish payments are
-            handled via the Stripe payment platform.
+            <strong>Notes:</strong> PayPal payments are processed securely through Stripe. Swish payments are
+            made directly in the Swish app by scanning the QR code and are not automatically tracked by this site.
           </p>
         </footer>
       </div>

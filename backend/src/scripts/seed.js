@@ -14,16 +14,16 @@ const seedBars = async () => {
     const bars = [
       {
         label: 'V',
-        currentValue: 120,
+        currentValue: 0,
         swishNumber: '+46700000001',
         paypalUser: 'yourname/',
         order: 1,
         color: 'rgb(145, 20, 20)',
-        about: 'Moderate party focused on liberal values and social progress.',
+        about: 'V stands for socialist, feminist, and green policies, advocating for social justice, equality',
       },
       {
         label: 'S',
-        currentValue: 80,
+        currentValue: 0,
         swishNumber: '+46700000002',
         paypalUser: 'yourname/',
         order: 2,
@@ -32,7 +32,7 @@ const seedBars = async () => {
       },
       {
         label: 'M P',
-        currentValue: 200,
+        currentValue: 0,
         swishNumber: '+46700000003',
         paypalUser: 'yourname/',
         order: 3,
@@ -41,7 +41,7 @@ const seedBars = async () => {
       },
       {
         label: 'C',
-        currentValue: 40,
+        currentValue: 0,
         swishNumber: '+46700000004',
         paypalUser: 'yourname/',
         order: 4,
@@ -50,7 +50,7 @@ const seedBars = async () => {
       },
       {
         label: 'L',
-        currentValue: 60,
+        currentValue: 0,
         swishNumber: '+46700000005',
         paypalUser: 'yourname/',
         order: 5,
@@ -59,7 +59,7 @@ const seedBars = async () => {
       },
       {
         label: 'K D',
-        currentValue: 95,
+        currentValue: 0,
         swishNumber: '+46700000006',
         paypalUser: 'yourname/',
         order: 6,
@@ -68,7 +68,7 @@ const seedBars = async () => {
       },
       {
         label: 'M',
-        currentValue: 30,
+        currentValue: 0,
         swishNumber: '+46700000007',
         paypalUser: 'yourname/',
         order: 7,
@@ -77,22 +77,13 @@ const seedBars = async () => {
       },
       {
         label: 'S D',
-        currentValue: 140,
+        currentValue: 0,
         swishNumber: '+46700000008',
         paypalUser: 'yourname/',
         order: 8,
         color: 'rgb(255, 195, 70)',
         about: 'Sweden Democrats focusing on immigration and national identity.',
-      },
-      {
-        label: '0',
-        currentValue: 240,
-        swishNumber: '+46700000008',
-        paypalUser: 'yourname/',
-        order: 8,
-        color: 'rgb(140, 140, 140)',
-        about: 'Sweden Democrats focusing on immigration and national identity.',
-      },
+      }
     ];
 
     await Bar.insertMany(bars);

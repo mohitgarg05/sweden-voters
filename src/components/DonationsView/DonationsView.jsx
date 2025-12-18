@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { completeSwishDonation } from '../../services/api';
 import './DonationsView.css';
 
 export default function DonationsView({ donations, stats, onReload }) {
@@ -6,6 +7,21 @@ export default function DonationsView({ donations, stats, onReload }) {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  const handleCompleteSwish = async (donationId) => {
+    if (!window.confirm('Mark this Swish donation as completed and update the bar total?')) {
+      return;
+    }
+    try {
+      await completeSwishDonation(donationId);
+      if (onReload) {
+        await onReload();
+      }
+    } catch (error) {
+      console.error('Failed to complete Swish donation:', error);
+      alert('Failed to complete Swish donation. Please try again.');
+    }
   };
 
   const filteredDonations = filterBar
@@ -64,26 +80,53 @@ export default function DonationsView({ donations, stats, onReload }) {
                 <th>Amount</th>
                 <th>Payment Method</th>
                 <th>Payment Status</th>
+                <th>Order / Message</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredDonations.map((donation) => (
-                <tr key={donation._id || donation.id}>
-                  <td>{formatDate(donation.createdAt)}</td>
-                  <td>{donation.barId?.label || 'N/A'}</td>
-                  <td className="donations-view__amount">{donation.amount} SEK</td>
-                  <td>
-                    <span className={`donations-view__method ${donation.paymentMethod || 'manual'}`}>
-                      {donation.paymentMethod || 'manual'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`donations-view__status ${donation.stripePaymentStatus || 'pending'}`}>
-                      {donation.stripePaymentStatus || 'pending'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filteredDonations.map((donation) => {
+                const id = donation._id || donation.id;
+                const isSwish = donation.paymentMethod === 'swish';
+                const swishStatus = donation.swishStatus || 'pending';
+                const statusLabel =
+                  isSwish ? `Swish: ${swishStatus}` : donation.stripePaymentStatus || 'pending';
+                const orderOrMessage =
+                  donation.swishOrderId ||
+                  donation.donorInfo?.message ||
+                  donation.donorInfo?.note ||
+                  '';
+
+                return (
+                  <tr key={id}>
+                    <td>{formatDate(donation.createdAt)}</td>
+                    <td>{donation.barId?.label || 'N/A'}</td>
+                    <td className="donations-view__amount">{donation.amount} SEK</td>
+                    <td>
+                      <span className={`donations-view__method ${donation.paymentMethod || 'manual'}`}>
+                        {donation.paymentMethod || 'manual'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`donations-view__status ${statusLabel.replace(/\s+/g, '-').toLowerCase()}`}>
+                        {statusLabel}
+                      </span>
+                    </td>
+                    <td>{orderOrMessage}</td>
+                    <td>
+                      {isSwish && swishStatus === 'pending' && (
+                        <button
+                          type="button"
+                          className="donations-view__action-btn"
+                          onClick={() => handleCompleteSwish(id)}
+                        >
+                          Mark Swish as Completed
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

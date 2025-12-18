@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { createSwishPaymentIntent, createPayPalPaymentIntent, verifyPaymentStatus } from '../../services/api';
+import { createPayPalPaymentIntent, verifyPaymentStatus } from '../../services/api';
+import { makeSwishLink } from '../../utils/payment';
+import QRCode from '../QRCode';
 import './DonationBarCard.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
@@ -9,6 +11,7 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
   const [amount, setAmount] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const [swishUrl, setSwishUrl] = useState('');
 
   // Check for payment intent in URL (return from redirect)
   useEffect(() => {
@@ -46,42 +49,37 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
       return;
     }
 
-    setIsProcessingPayment(true);
+    const random4 = Math.floor(1000 + Math.random() * 9000); // 1000-9999
+    const orderId = `SW-${random4}-${Date.now()}`;
+    const message = `Order ${orderId} - Donation to ${bar.label}`;
+
     setPaymentMethod('swish');
+
     try {
-      // Create payment intent
-      const { clientSecret, paymentIntentId } = await createSwishPaymentIntent(
-        bar._id || bar.id,
-        donationAmount
-      );
-
-      // Initialize Stripe
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe failed to initialize. Please check your Stripe publishable key.');
-      }
-
-      // Confirm payment with Swish (redirects to Swish app)
-      const { error } = await stripe.confirmSwishPayment(clientSecret, {
-        payment_method: {
-          type: 'swish',
+      // Create a pending Swish donation entry in the backend without updating the bar total yet
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/donations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        return_url: `${window.location.origin}?payment_intent=${paymentIntentId}&bar_id=${bar._id || bar.id}`,
+        body: JSON.stringify({
+          barId: bar._id || bar.id,
+          amount: donationAmount,
+          paymentMethod: 'swish',
+          donorInfo: {
+            message,
+          },
+          swishOrderId: orderId,
+          skipBarUpdate: true,
+        }),
       });
-
-      if (error) {
-        console.error('Payment error:', error);
-        alert(`Payment failed: ${error.message}`);
-        setIsProcessingPayment(false);
-        setPaymentMethod(null);
-      }
-      // If no error, user will be redirected to Swish app
     } catch (error) {
-      console.error('Payment failed:', error);
-      alert('Failed to process payment. Please try again.');
-      setIsProcessingPayment(false);
-      setPaymentMethod(null);
+      console.error('Failed to create Swish donation record:', error);
+      // Continue to show QR so user can still pay, but admin will have to reconcile manually
     }
+
+    const url = makeSwishLink("+46764361382", donationAmount, message, []); // amount & message locked by default
+    setSwishUrl(url);
   };
 
   const handlePayPalPayment = async (e) => {
@@ -160,9 +158,9 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
             type="button"
             onClick={handleSwishPayment}
             className="donation-bar-card__button donation-bar-card__button--swish"
-            disabled={isProcessingPayment || !amount}
+            disabled={!amount}
           >
-            {isProcessingPayment && paymentMethod === 'swish' ? 'Processing...' : 'Add amount by Swish'}
+            Add amount by Swish
           </button>
 
           <button
@@ -174,6 +172,15 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
             {isProcessingPayment && paymentMethod === 'paypal' ? 'Processing...' : 'Add amount by PayPal'}
           </button>
         </div>
+
+        {paymentMethod === 'swish' && swishUrl && (
+          <div className="donation-bar-card__qr">
+            <QRCode
+              value={swishUrl}
+              title={`Scan with Swish to donate to ${bar.label}`}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

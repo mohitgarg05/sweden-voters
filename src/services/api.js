@@ -179,19 +179,6 @@ export function getAuthToken() {
   return localStorage.getItem('adminToken');
 }
 
-export async function createSwishPaymentIntent(barId, amount) {
-  try {
-    const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-payment-intent`, {
-      barId,
-      amount,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error creating payment intent:', error);
-    throw error;
-  }
-}
-
 export async function createPayPalPaymentIntent(barId, amount) {
   try {
     const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-paypal-payment-intent`, {
@@ -211,6 +198,16 @@ export async function verifyPaymentStatus(paymentIntentId) {
     return response.data;
   } catch (error) {
     console.error('Error verifying payment status:', error);
+    throw error;
+  }
+}
+
+export async function completeSwishDonation(donationId) {
+  try {
+    const response = await apiClient.patch(`/swish-admin/${donationId}/complete`);
+    return response.data;
+  } catch (error) {
+    console.error('Error completing Swish donation:', error);
     throw error;
   }
 }
