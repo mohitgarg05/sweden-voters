@@ -113,10 +113,6 @@
   color: #1e40af;
 }
 
-.donations-view__method.paypal {
-  background: #fef3c7;
-  color: #92400e;
-}
 
 .donations-view__method.manual {
   background: #e5e7eb;

@@ -5,7 +5,6 @@ import {
   DEFAULT_BAR_LABELS,
   DEFAULT_INITIAL_VALUES,
   DEFAULT_SWISH_NUMBERS,
-  DEFAULT_PAYPAL_USERS,
 } from '../constants/config';
 
 const apiClient = axios.create({
@@ -29,7 +28,6 @@ const transformBar = (bar) => ({
   label: bar.label,
   currentValue: bar.currentValue,
   swishNumber: bar.swishNumber,
-  paypalUser: bar.paypalUser,
   isActive: bar.isActive,
   order: bar.order,
   color: bar.color,
@@ -179,15 +177,15 @@ export function getAuthToken() {
   return localStorage.getItem('adminToken');
 }
 
-export async function createPayPalPaymentIntent(barId, amount) {
+export async function createCardCheckoutSession(barId, amount) {
   try {
-    const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-paypal-payment-intent`, {
+    const response = await apiClient.post(`${API_ENDPOINTS.STRIPE}/create-card-checkout-session`, {
       barId,
       amount,
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating PayPal payment intent:', error);
+    console.error('Error creating checkout session:', error);
     throw error;
   }
 }
@@ -219,7 +217,6 @@ function getDefaultBarsData() {
     label,
     currentValue: DEFAULT_INITIAL_VALUES[index],
     swishNumber: DEFAULT_SWISH_NUMBERS[index],
-    paypalUser: DEFAULT_PAYPAL_USERS[index],
     isActive: true,
     order: index + 1,
   }));
@@ -228,7 +225,6 @@ function getDefaultBarsData() {
 function getDefaultConfig() {
   return {
     swishNumbers: DEFAULT_SWISH_NUMBERS,
-    paypalUsers: DEFAULT_PAYPAL_USERS,
   };
 }
 

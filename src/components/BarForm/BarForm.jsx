@@ -6,7 +6,6 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
     label: '',
     currentValue: 0,
     swishNumber: '',
-    paypalUser: '',
     order: 0,
     isActive: true,
     about: '',
@@ -19,7 +18,6 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
         label: bar.label || '',
         currentValue: bar.currentValue || 0,
         swishNumber: bar.swishNumber || '',
-        paypalUser: bar.paypalUser || '',
         order: bar.order || 0,
         isActive: bar.isActive !== undefined ? bar.isActive : true,
         about: bar.about || '',
@@ -79,18 +77,6 @@ export default function BarForm({ bar, onSubmit, onCancel }) {
             value={formData.swishNumber}
             onChange={handleChange}
             placeholder="+46700000001"
-            required
-          />
-        </div>
-
-        <div className="bar-form__field">
-          <label>PayPal User</label>
-          <input
-            type="text"
-            name="paypalUser"
-            value={formData.paypalUser}
-            onChange={handleChange}
-            placeholder="yourname/"
             required
           />
         </div>

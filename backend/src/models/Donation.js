@@ -14,7 +14,7 @@ const donationSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['swish', 'paypal', 'manual'],
+      enum: ['swish', 'manual', 'card'],
       default: 'manual',
     },
     donorInfo: {

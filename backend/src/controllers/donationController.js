@@ -29,7 +29,7 @@ export const createDonation = async (req, res) => {
     let updatedBar = bar;
     // IMPORTANT:
     // - Swish donations should NOT update the bar total while pending.
-    // - Only non-Swish donations (manual / PayPal, etc.) update immediately.
+    // - Only non-Swish donations (manual, etc.) update immediately.
     if (!skipBarUpdate && donation.paymentMethod !== 'swish') {
       bar.currentValue += amount;
       updatedBar = await bar.save();

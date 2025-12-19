@@ -18,11 +18,6 @@ const barSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    paypalUser: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     isActive: {
       type: Boolean,
       default: true,

@@ -13,7 +13,6 @@ export default function BarList({ bars, onEdit, onDelete }) {
             <th>Label</th>
             <th>Current Value</th>
             <th>Swish Number</th>
-            <th>PayPal User</th>
             <th>Order</th>
             <th>Status</th>
             <th>Actions</th>
@@ -25,7 +24,6 @@ export default function BarList({ bars, onEdit, onDelete }) {
               <td>{bar.label}</td>
               <td>{bar.currentValue}</td>
               <td>{bar.swishNumber}</td>
-              <td>{bar.paypalUser}</td>
               <td>{bar.order}</td>
               <td>
                 <span className={`bar-list__status ${bar.isActive ? 'active' : 'inactive'}`}>

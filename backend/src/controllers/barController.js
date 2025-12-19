@@ -23,12 +23,11 @@ export const getBarById = async (req, res) => {
 
 export const createBar = async (req, res) => {
   try {
-    const { label, currentValue, swishNumber, paypalUser, order, about, color } = req.body;
+    const { label, currentValue, swishNumber, order, about, color } = req.body;
     const bar = new Bar({
       label,
       currentValue: currentValue || 0,
       swishNumber,
-      paypalUser,
       order: order || 0,
       about: about || '',
       color: color || '#2b7a78',
@@ -42,14 +41,13 @@ export const createBar = async (req, res) => {
 
 export const updateBar = async (req, res) => {
   try {
-    const { label, currentValue, swishNumber, paypalUser, isActive, order, about, color } = req.body;
+    const { label, currentValue, swishNumber, isActive, order, about, color } = req.body;
     const bar = await Bar.findByIdAndUpdate(
       req.params.id,
       {
         ...(label && { label }),
         ...(currentValue !== undefined && { currentValue }),
         ...(swishNumber && { swishNumber }),
-        ...(paypalUser && { paypalUser }),
         ...(isActive !== undefined && { isActive }),
         ...(order !== undefined && { order }),
         ...(about !== undefined && { about }),

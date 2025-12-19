@@ -54,13 +54,16 @@ npm run dev
 - label (String, required)
 - currentValue (Number, default: 0)
 - swishNumber (String, required)
-- paypalUser (String, required)
 - isActive (Boolean, default: true)
 - order (Number, default: 0)
+- about (String, optional)
+- color (String, default: '#2b7a78')
 
 ### Donation
 - barId (ObjectId, required, ref: Bar)
 - amount (Number, required)
-- paymentMethod (String, enum: ['swish', 'paypal', 'manual'])
+- paymentMethod (String, enum: ['swish', 'card', 'manual'])
 - donorInfo (Object with name, email, message)
+- stripePaymentIntentId (String, optional)
+- stripePaymentStatus (String, enum: ['pending', 'succeeded', 'failed', 'canceled'])
 

@@ -16,8 +16,8 @@ function getStripe() {
   return stripeInstance;
 }
 
-// Create a payment intent for PayPal
-export const createPayPalPaymentIntent = async (req, res) => {
+// Create a checkout session for card payment (redirects to Stripe)
+export const createCardCheckoutSession = async (req, res) => {
   try {
     const { barId, amount } = req.body;
 
@@ -34,36 +34,55 @@ export const createPayPalPaymentIntent = async (req, res) => {
       return res.status(404).json({ error: 'Bar not found' });
     }
 
-    // Create payment intent with PayPal as payment method
-    const stripe = getStripe();
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to öre (Swedish cents)
-      currency: 'sek',
-      payment_method_types: ['paypal'],
-      metadata: {
-        barId: barId.toString(),
-        barLabel: bar.label,
-      },
-    });
-
-    // Create a pending donation record
+    // Create a pending donation record first
     const donation = new Donation({
       barId,
       amount,
-      paymentMethod: 'paypal',
-      stripePaymentIntentId: paymentIntent.id,
+      paymentMethod: 'card',
       stripePaymentStatus: 'pending',
     });
+    await donation.save();
 
+    // Create checkout session with Stripe
+    const stripe = getStripe();
+    const baseUrl = process.env.FRONTEND_URL || req.headers.origin || 'http://localhost:5173';
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'sek',
+            product_data: {
+              name: `Donation to ${bar.label}`,
+              description: `Donation to ${bar.label}`,
+            },
+            unit_amount: Math.round(amount * 100), // Convert to öre (Swedish cents)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${baseUrl}?payment_success=true&session_id={CHECKOUT_SESSION_ID}&bar_id=${barId}`,
+      cancel_url: `${baseUrl}?payment_canceled=true&bar_id=${barId}`,
+      metadata: {
+        barId: barId.toString(),
+        barLabel: bar.label,
+        donationId: donation._id.toString(),
+      },
+    });
+
+    // Update donation with checkout session ID
+    donation.stripePaymentIntentId = session.id; // Store session ID
     await donation.save();
 
     res.status(200).json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
+      sessionId: session.id,
+      url: session.url,
       donationId: donation._id,
     });
   } catch (error) {
-    console.error('Error creating PayPal payment intent:', error);
+    console.error('Error creating checkout session:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -92,6 +111,9 @@ export const handleStripeWebhook = async (req, res) => {
   try {
     // Handle the event
     switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object);
+        break;
       case 'payment_intent.succeeded':
         await handlePaymentSuccess(event.data.object);
         break;
@@ -111,6 +133,40 @@ export const handleStripeWebhook = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Handle checkout session completed
+async function handleCheckoutSessionCompleted(session) {
+  try {
+    const donationId = session.metadata?.donationId;
+    if (!donationId) {
+      console.error(`Donation ID not found in checkout session ${session.id}`);
+      return;
+    }
+
+    const donation = await Donation.findById(donationId);
+    if (!donation) {
+      console.error(`Donation not found for ID ${donationId}`);
+      return;
+    }
+
+    // Only update if payment was pending (avoid double processing)
+    if (donation.stripePaymentStatus === 'pending') {
+      donation.stripePaymentStatus = 'succeeded';
+      donation.stripePaymentIntentId = session.id;
+      await donation.save();
+
+      // Update bar current value
+      const bar = await Bar.findById(donation.barId);
+      if (bar) {
+        bar.currentValue += donation.amount;
+        await bar.save();
+      }
+    }
+  } catch (error) {
+    console.error('Error handling checkout session completed:', error);
+    throw error;
+  }
+}
 
 // Handle successful payment
 async function handlePaymentSuccess(paymentIntent) {
@@ -176,13 +232,30 @@ async function handlePaymentCanceled(paymentIntent) {
   }
 }
 
-// Verify payment status
+// Verify payment status (works with both checkout sessions and payment intents)
 export const verifyPaymentStatus = async (req, res) => {
   try {
     const { paymentIntentId } = req.params;
 
     const stripe = getStripe();
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    // Try to retrieve as checkout session first
+    let session = null;
+    let paymentIntent = null;
+    let status = null;
+
+    try {
+      session = await stripe.checkout.sessions.retrieve(paymentIntentId);
+      status = session.payment_status === 'paid' ? 'succeeded' : session.payment_status;
+    } catch (err) {
+      // If not a checkout session, try as payment intent
+      try {
+        paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        status = paymentIntent.status;
+      } catch (err2) {
+        return res.status(404).json({ error: 'Payment not found' });
+      }
+    }
 
     const donation = await Donation.findOne({
       stripePaymentIntentId: paymentIntentId,
@@ -193,7 +266,7 @@ export const verifyPaymentStatus = async (req, res) => {
     }
 
     // If payment succeeded but donation status is still pending, update it
-    if (paymentIntent.status === 'succeeded' && donation.stripePaymentStatus === 'pending') {
+    if (status === 'succeeded' && donation.stripePaymentStatus === 'pending') {
       donation.stripePaymentStatus = 'succeeded';
       await donation.save();
 
@@ -205,7 +278,7 @@ export const verifyPaymentStatus = async (req, res) => {
     }
 
     res.json({
-      status: paymentIntent.status,
+      status: status,
       donationStatus: donation.stripePaymentStatus,
       amount: donation.amount,
       barId: donation.barId,

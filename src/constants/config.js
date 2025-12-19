@@ -9,17 +9,6 @@ export const DEFAULT_SWISH_NUMBERS = [
   '+46700000008',
 ];
 
-export const DEFAULT_PAYPAL_USERS = [
-  'yourname/',
-  'yourname/',
-  'yourname/',
-  'yourname/',
-  'yourname/',
-  'yourname/',
-  'yourname/',
-  'yourname/',
-];
-
 export const DEFAULT_BAR_LABELS = [
   'Bar 1',
   'Bar 2',

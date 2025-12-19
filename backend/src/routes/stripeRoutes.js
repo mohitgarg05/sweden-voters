@@ -1,13 +1,13 @@
 import express from 'express';
 import {
-  createPayPalPaymentIntent,
   verifyPaymentStatus,
+  createCardCheckoutSession,
 } from '../controllers/stripeController.js';
 
 const router = express.Router();
 
-// Create payment intent for PayPal
-router.post('/create-paypal-payment-intent', createPayPalPaymentIntent);
+// Create checkout session for Card payment (redirects to Stripe)
+router.post('/create-card-checkout-session', createCardCheckoutSession);
 
 // Verify payment status
 router.get('/verify-payment/:paymentIntentId', verifyPaymentStatus);

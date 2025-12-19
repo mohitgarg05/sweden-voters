@@ -1,41 +1,54 @@
-import { useState, useEffect } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { createPayPalPaymentIntent, verifyPaymentStatus } from '../../services/api';
+import { useState, useEffect, useRef } from 'react';
+import { createCardCheckoutSession, verifyPaymentStatus } from '../../services/api';
 import { makeSwishLink } from '../../utils/payment';
 import QRCode from '../QRCode';
 import './DonationBarCard.css';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
-
 export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
   const [amount, setAmount] = useState('');
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [swishUrl, setSwishUrl] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const processedSessionRef = useRef(new Set()); // Track processed session IDs
 
-  // Check for payment intent in URL (return from redirect)
+  // Check for payment success in URL (return from Stripe Checkout)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const paymentIntentId = urlParams.get('payment_intent');
+    const paymentSuccess = urlParams.get('payment_success');
+    const sessionId = urlParams.get('session_id');
     const barId = urlParams.get('bar_id');
 
-    if (paymentIntentId && barId && (bar._id === barId || bar.id === barId)) {
-      verifyPaymentStatus(paymentIntentId)
+    // Check if this session was already processed
+    if (sessionId && processedSessionRef.current.has(sessionId)) {
+      return; // Already processed, skip
+    }
+
+    if (paymentSuccess === 'true' && sessionId && barId && (bar._id === barId || bar.id === barId)) {
+      // Mark as processed immediately to prevent duplicates
+      processedSessionRef.current.add(sessionId);
+      
+      // Clean URL immediately to prevent re-processing on re-renders
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      verifyPaymentStatus(sessionId)
         .then((status) => {
-          if (status.status === 'succeeded' && status.donationStatus === 'succeeded') {
-            // Payment was successful and donation was recorded by webhook
-            // Just reload bars to get updated values
-            if (onPaymentSuccess) {
-              onPaymentSuccess();
-            }
+          if (status.status === 'succeeded' || status.donationStatus === 'succeeded') {
+            // Payment was successful
             alert('Payment successful! Thank you for your donation.');
             setAmount('');
-            // Clean URL
-            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Call callback after a short delay to ensure state updates
+            if (onPaymentSuccess) {
+              setTimeout(() => {
+                onPaymentSuccess();
+              }, 100);
+            }
           }
         })
         .catch((error) => {
           console.error('Error verifying payment:', error);
+          // Remove from processed set on error so it can retry
+          processedSessionRef.current.delete(sessionId);
         });
     }
   }, [bar._id, bar.id, onPaymentSuccess]);
@@ -82,7 +95,7 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
     setSwishUrl(url);
   };
 
-  const handlePayPalPayment = async (e) => {
+  const handleCardPayment = async (e) => {
     e.preventDefault();
     const donationAmount = Number(amount);
 
@@ -92,32 +105,21 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
     }
 
     setIsProcessingPayment(true);
-    setPaymentMethod('paypal');
+    setPaymentMethod('card');
+
     try {
-      // Create payment intent
-      const { clientSecret, paymentIntentId } = await createPayPalPaymentIntent(
+      // Create checkout session and redirect to Stripe
+      const { url } = await createCardCheckoutSession(
         bar._id || bar.id,
         donationAmount
       );
 
-      // Initialize Stripe
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe failed to initialize. Please check your Stripe publishable key.');
+      if (url) {
+        // Redirect to Stripe Checkout
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL received');
       }
-
-      // Confirm payment with PayPal (redirects to PayPal)
-      const { error } = await stripe.confirmPayPalPayment(clientSecret, {
-        return_url: `${window.location.origin}?payment_intent=${paymentIntentId}&bar_id=${bar._id || bar.id}`,
-      });
-
-      if (error) {
-        console.error('Payment error:', error);
-        alert(`Payment failed: ${error.message}`);
-        setIsProcessingPayment(false);
-        setPaymentMethod(null);
-      }
-      // If no error, user will be redirected to PayPal
     } catch (error) {
       console.error('Payment failed:', error);
       alert('Failed to process payment. Please try again.');
@@ -165,11 +167,11 @@ export default function DonationBarCard({ bar, onDonate, onPaymentSuccess }) {
 
           <button
             type="button"
-            onClick={handlePayPalPayment}
-            className="donation-bar-card__button donation-bar-card__button--paypal"
+            onClick={handleCardPayment}
+            className="donation-bar-card__button donation-bar-card__button--card"
             disabled={isProcessingPayment || !amount}
           >
-            {isProcessingPayment && paymentMethod === 'paypal' ? 'Processing...' : 'Add amount by PayPal'}
+            {isProcessingPayment ? 'Redirecting to Stripe...' : 'Add amount by Card'}
           </button>
         </div>
 
