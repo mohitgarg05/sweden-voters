@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import routes from './routes/index.js';
 import { handleStripeWebhook } from './controllers/stripeController.js';
+import { deleteOldPendingSwishDonations, initializeCronJobs } from './services/cronJobs.js';
 
 dotenv.config();
 
@@ -28,7 +29,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-connectDB();
+connectDB().then(() => {
+  // Initialize cron jobs after database connection is established
+  // initializeCronJobs();
+  deleteOldPendingSwishDonations()
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
