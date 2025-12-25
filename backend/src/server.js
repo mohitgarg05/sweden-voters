@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import routes from './routes/index.js';
 import { handleStripeWebhook } from './controllers/stripeController.js';
-import { deleteOldPendingSwishDonations, initializeCronJobs } from './services/cronJobs.js';
+import { initializeCronJobs } from './services/cronJobs.js';
 
 dotenv.config();
 
@@ -31,8 +31,7 @@ app.get('/api/health', (req, res) => {
 
 connectDB().then(() => {
   // Initialize cron jobs after database connection is established
-  // initializeCronJobs();
-  deleteOldPendingSwishDonations()
+  initializeCronJobs();
 });
 
 app.listen(PORT, () => {
