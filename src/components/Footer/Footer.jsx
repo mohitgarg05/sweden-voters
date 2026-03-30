@@ -8,7 +8,7 @@ export default function Footer() {
           <strong>Thomas Nordholm</strong>, Malmo, Sweden
         </p>
         <p className="site-footer__line">
-          <strong>Phone in Sweden:</strong> 040-229388
+          <strong>Phone in Sweden:</strong> 0761-164728
         </p>
         <p className="site-footer__line">
           <strong>Mail:</strong> <a href="mailto:thomas.nordholm@protonmail.com">thomas.nordholm@protonmail.com</a>
